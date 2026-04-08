@@ -45,5 +45,26 @@ bin/
 
 # Mainframe artifacts
 *.cbl.bak
-*.dat
-*.idx
+
+# COBOL compiled binaries
+*.so
+*.o
+*.exe
+*.dll
+
+# Generated reports
+reports/*.txt
+reports/*.log
+!reports/.gitkeep
+
+# Backup files
+data/backup_*
+*.bak
+*~
+
+# Docker volumes
+.docker/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,166 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PYMTAUTH.
+       AUTHOR. CONTINENTAL INSURANCE GROUP.
+      ******************************************************************
+      * PAYMENT AUTHORIZATION PROGRAM                                  *
+      * CALCULATES PAYMENT AMOUNT BASED ON CLAIM AND POLICY            *
+      * INCLUDES COMPLEX CALCULATION LOGIC                             *
+      ******************************************************************
+       
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  WS-GROSS-AMOUNT          PIC 9(7)V99.
+       01  WS-DEDUCTIBLE-APPLIED    PIC 9(7)V99.
+       01  WS-COINSURANCE-AMOUNT    PIC 9(7)V99.
+       01  WS-COPAY-AMOUNT          PIC 9(5)V99.
+       01  WS-NET-PAYMENT           PIC 9(7)V99.
+       
+      * HARDCODED PAYMENT CALCULATION RULES
+       01  WS-COINSURANCE-RATE      PIC 99V99.
+       01  WS-COPAY-TABLE.
+           05  WS-MEDICAL-COPAY     PIC 9(3)V99 VALUE 25.00.
+           05  WS-DENTAL-COPAY      PIC 9(3)V99 VALUE 15.00.
+           05  WS-VISION-COPAY      PIC 9(3)V99 VALUE 10.00.
+           05  WS-PHARMACY-COPAY    PIC 9(3)V99 VALUE 10.00.
+       
+       01  WS-PAYMENT-RECORD.
+           COPY PYMTREC.
+       
+       01  WS-CURRENT-DATE-DATA.
+           05  WS-CURR-YEAR         PIC 9(4).
+           05  WS-CURR-MONTH        PIC 9(2).
+           05  WS-CURR-DAY          PIC 9(2).
+       
+       01  WS-AUTH-COUNTER          PIC 9(6) VALUE 0.
+
+       LINKAGE SECTION.
+       01  LS-CLAIM-RECORD.
+           COPY CLMREC.
+       01  LS-POLICY-RECORD.
+           COPY POLREC.
+       01  LS-PAYMENT-AMOUNT        PIC 9(7)V99.
+
+       PROCEDURE DIVISION USING LS-CLAIM-RECORD
+                                LS-POLICY-RECORD
+                                LS-PAYMENT-AMOUNT.
+       
+       0000-MAIN-AUTHORIZATION.
+           PERFORM 1000-INITIALIZE-PAYMENT
+           PERFORM 2000-CALCULATE-PAYMENT
+           PERFORM 3000-APPLY-LIMITS
+           PERFORM 4000-GENERATE-AUTH-CODE
+           PERFORM 9000-FINALIZE
+           GOBACK.
+
+       1000-INITIALIZE-PAYMENT.
+           MOVE ZERO TO WS-GROSS-AMOUNT
+           MOVE ZERO TO WS-DEDUCTIBLE-APPLIED
+           MOVE ZERO TO WS-COINSURANCE-AMOUNT
+           MOVE ZERO TO WS-COPAY-AMOUNT
+           MOVE ZERO TO WS-NET-PAYMENT
+           MOVE ZERO TO LS-PAYMENT-AMOUNT
+           
+           ACCEPT WS-CURRENT-DATE-DATA FROM DATE YYYYMMDD.
+
+       2000-CALCULATE-PAYMENT.
+           MOVE CLM-CLAIM-AMOUNT TO WS-GROSS-AMOUNT
+           
+      *    DETERMINE COINSURANCE RATE BY PLAN TYPE
+           EVALUATE POL-PLAN-TYPE
+               WHEN "BS"
+                   MOVE 80.00 TO WS-COINSURANCE-RATE
+               WHEN "SV"
+                   MOVE 70.00 TO WS-COINSURANCE-RATE
+               WHEN "PR"
+                   MOVE 90.00 TO WS-COINSURANCE-RATE
+               WHEN "BR"
+                   MOVE 60.00 TO WS-COINSURANCE-RATE
+               WHEN OTHER
+                   MOVE 80.00 TO WS-COINSURANCE-RATE
+           END-EVALUATE
+           
+      *    APPLY DEDUCTIBLE
+           PERFORM 2100-APPLY-DEDUCTIBLE
+           
+      *    APPLY COPAY BASED ON CLAIM TYPE
+           PERFORM 2200-APPLY-COPAY
+           
+      *    CALCULATE COINSURANCE
+           PERFORM 2300-CALCULATE-COINSURANCE
+           
+      *    COMPUTE NET PAYMENT
+           PERFORM 2400-COMPUTE-NET-PAYMENT.
+
+       2100-APPLY-DEDUCTIBLE.
+           IF POL-DEDUCTIBLE > 0
+               COMPUTE WS-DEDUCTIBLE-APPLIED = 
+                   FUNCTION MIN(WS-GROSS-AMOUNT, POL-DEDUCTIBLE)
+               END-COMPUTE
+           ELSE
+               MOVE ZERO TO WS-DEDUCTIBLE-APPLIED
+           END-IF.
+
+       2200-APPLY-COPAY.
+           EVALUATE CLM-CLAIM-TYPE
+               WHEN "01"
+                   MOVE WS-MEDICAL-COPAY TO WS-COPAY-AMOUNT
+               WHEN "02"
+                   MOVE WS-DENTAL-COPAY TO WS-COPAY-AMOUNT
+               WHEN "03"
+                   MOVE WS-VISION-COPAY TO WS-COPAY-AMOUNT
+               WHEN "04"
+                   MOVE WS-PHARMACY-COPAY TO WS-COPAY-AMOUNT
+               WHEN OTHER
+                   MOVE ZERO TO WS-COPAY-AMOUNT
+           END-EVALUATE.
+
+       2300-CALCULATE-COINSURANCE.
+           COMPUTE WS-COINSURANCE-AMOUNT ROUNDED = 
+               (WS-GROSS-AMOUNT - WS-DEDUCTIBLE-APPLIED - 
+                WS-COPAY-AMOUNT) * (WS-COINSURANCE-RATE / 100)
+           END-COMPUTE
+           
+           IF WS-COINSURANCE-AMOUNT < 0
+               MOVE ZERO TO WS-COINSURANCE-AMOUNT
+           END-IF.
+
+       2400-COMPUTE-NET-PAYMENT.
+           COMPUTE WS-NET-PAYMENT = WS-COINSURANCE-AMOUNT
+           END-COMPUTE.
+
+       3000-APPLY-LIMITS.
+      *    ENSURE PAYMENT DOESN'T EXCEED POLICY MAX COVERAGE
+           IF WS-NET-PAYMENT > POL-MAX-COVERAGE
+               MOVE POL-MAX-COVERAGE TO WS-NET-PAYMENT
+           END-IF
+           
+      *    ENSURE PAYMENT DOESN'T EXCEED CLAIM AMOUNT
+           IF WS-NET-PAYMENT > CLM-CLAIM-AMOUNT
+               MOVE CLM-CLAIM-AMOUNT TO WS-NET-PAYMENT
+           END-IF
+           
+      *    MINIMUM PAYMENT CHECK
+           IF WS-NET-PAYMENT < 0
+               MOVE ZERO TO WS-NET-PAYMENT
+           END-IF.
+
+       4000-GENERATE-AUTH-CODE.
+      *    GENERATE 6-DIGIT AUTHORIZATION CODE
+           ADD 1 TO WS-AUTH-COUNTER
+           MOVE CLM-CLAIM-NUMBER TO PYMT-CLAIM-NUMBER
+           MOVE WS-NET-PAYMENT TO PYMT-PAYMENT-AMOUNT
+           
+           STRING WS-CURR-YEAR WS-CURR-MONTH WS-CURR-DAY
+               DELIMITED BY SIZE
+               INTO PYMT-PAYMENT-DATE
+           END-STRING
+           
+           STRING "A" WS-AUTH-COUNTER
+               DELIMITED BY SIZE
+               INTO PYMT-AUTH-CODE
+           END-STRING
+           
+           MOVE "A" TO PYMT-STATUS.
+
+       9000-FINALIZE.
+           MOVE WS-NET-PAYMENT TO LS-PAYMENT-AMOUNT.

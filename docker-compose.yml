@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  cobol-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: continental-insurance-cobol
+    image: continental-insurance/claims-processor:latest
+    
+    # Environment variables
+    environment:
+      - COB_LIBRARY_PATH=/app/bin
+      - COBPATH=/app/src/copybooks
+      - TZ=America/New_York
+    
+    # Mount data and reports directories for persistence
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports
+      - ./src:/app/src
+    
+    # Keep container running for interactive use
+    stdin_open: true
+    tty: true
+    
+    # Default command
+    command: make run
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Alternative service for batch processing
+  cobol-batch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: continental-insurance-batch
+    image: continental-insurance/claims-processor:latest
+    profiles:
+      - batch
+    
+    environment:
+      - COB_LIBRARY_PATH=/app/bin
+      - COBPATH=/app/src/copybooks
+      - TZ=America/New_York
+    
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports
+      - ./src:/app/src
+    
+    command: make nightrun
+    
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
