@@ -3,8 +3,8 @@
 
 # Compiler and flags
 COBC = cobc
-COBCFLAGS = -x -std=cobol85 -I./src/copybooks -free
-COBCFLAGS_MODULE = -m -std=cobol85 -I./src/copybooks -free
+COBCFLAGS = -x -std=mf -I./src/copybooks -fixed
+COBCFLAGS_MODULE = -m -std=mf -I./src/copybooks -fixed
 
 # Directories
 SRC_DIR = src/cobol

@@ -55,9 +55,10 @@
            MOVE ZERO TO WS-SEARCH-COUNT.
 
        2000-SEARCH-POLICY.
-           PERFORM 2100-READ-POLICY UNTIL EOF-POLICIES
-                                        OR LS-FOUND-FLAG = 'Y'
-                                        OR WS-SEARCH-COUNT > WS-MAX-SEARCH.
+           PERFORM 2100-READ-POLICY
+             UNTIL EOF-POLICIES
+             OR LS-FOUND-FLAG = 'Y'
+             OR WS-SEARCH-COUNT > WS-MAX-SEARCH.
 
        2100-READ-POLICY.
            READ POLICY-MASTER
@@ -69,7 +70,8 @@
            END-READ.
 
        2200-CHECK-MATCH.
-           IF POL-POLICY-NUMBER = LS-POLICY-NUMBER
+           IF POL-POLICY-NUMBER OF POL-MASTER-REC
+             = LS-POLICY-NUMBER
                MOVE POL-MASTER-REC TO LS-POLICY-RECORD
                MOVE 'Y' TO LS-FOUND-FLAG
            END-IF.

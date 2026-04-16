@@ -35,12 +35,12 @@
        01  WS-SEPARATOR             PIC X(132) VALUE ALL "=".
        
        01  WS-DETAIL-LINE-1.
-           05  FILLER               PIC X(30) VALUE "TOTAL CLAIMS PROCESSED: ".
+           05  FILLER  PIC X(30) VALUE "TOTAL CLAIMS PROCESSED: ".
            05  WS-DTL-TOTAL         PIC ZZZ,ZZ9.
            05  FILLER               PIC X(96) VALUE SPACES.
        
        01  WS-DETAIL-LINE-2.
-           05  FILLER               PIC X(30) VALUE "CLAIMS APPROVED:        ".
+           05  FILLER  PIC X(30) VALUE "CLAIMS APPROVED:        ".
            05  WS-DTL-APPROVED      PIC ZZZ,ZZ9.
            05  FILLER               PIC X(10) VALUE SPACES.
            05  FILLER               PIC X(5) VALUE "(   ".
@@ -49,7 +49,7 @@
            05  FILLER               PIC X(79) VALUE SPACES.
        
        01  WS-DETAIL-LINE-3.
-           05  FILLER               PIC X(30) VALUE "CLAIMS DENIED:          ".
+           05  FILLER  PIC X(30) VALUE "CLAIMS DENIED:          ".
            05  WS-DTL-DENIED        PIC ZZZ,ZZ9.
            05  FILLER               PIC X(10) VALUE SPACES.
            05  FILLER               PIC X(5) VALUE "(   ".
@@ -58,7 +58,7 @@
            05  FILLER               PIC X(79) VALUE SPACES.
        
        01  WS-DETAIL-LINE-4.
-           05  FILLER               PIC X(30) VALUE "CLAIMS PENDING:         ".
+           05  FILLER  PIC X(30) VALUE "CLAIMS PENDING:         ".
            05  WS-DTL-PENDING       PIC ZZZ,ZZ9.
            05  FILLER               PIC X(10) VALUE SPACES.
            05  FILLER               PIC X(5) VALUE "(   ".
@@ -71,7 +71,7 @@
            05  FILLER               PIC X(102) VALUE SPACES.
        
        01  WS-DETAIL-LINE-6.
-           05  FILLER               PIC X(30) VALUE "TOTAL PAYMENTS:         $".
+           05  FILLER  PIC X(30) VALUE "TOTAL PAYMENTS:         $".
            05  WS-DTL-PAYMENTS      PIC ZZZ,ZZZ,ZZ9.99.
            05  FILLER               PIC X(87) VALUE SPACES.
        
@@ -146,17 +146,17 @@
            MOVE WS-PENDING-PCT TO WS-DTL-PEND-PCT.
 
        3000-WRITE-REPORT.
-           WRITE LS-REPORT-FILE FROM WS-HEADER-LINE-1
-           WRITE LS-REPORT-FILE FROM WS-HEADER-LINE-2
-           WRITE LS-REPORT-FILE FROM WS-HEADER-LINE-3
-           WRITE LS-REPORT-FILE FROM WS-SEPARATOR
-           WRITE LS-REPORT-FILE FROM SPACES
-           WRITE LS-REPORT-FILE FROM WS-DETAIL-LINE-1
-           WRITE LS-REPORT-FILE FROM SPACES
-           WRITE LS-REPORT-FILE FROM WS-DETAIL-LINE-2
-           WRITE LS-REPORT-FILE FROM WS-DETAIL-LINE-3
-           WRITE LS-REPORT-FILE FROM WS-DETAIL-LINE-4
-           WRITE LS-REPORT-FILE FROM WS-DETAIL-LINE-5
-           WRITE LS-REPORT-FILE FROM WS-DETAIL-LINE-6
-           WRITE LS-REPORT-FILE FROM SPACES
-           WRITE LS-REPORT-FILE FROM WS-SEPARATOR.
+           DISPLAY WS-HEADER-LINE-1
+           DISPLAY WS-HEADER-LINE-2
+           DISPLAY WS-HEADER-LINE-3
+           DISPLAY WS-SEPARATOR
+           DISPLAY SPACES
+           DISPLAY WS-DETAIL-LINE-1
+           DISPLAY SPACES
+           DISPLAY WS-DETAIL-LINE-2
+           DISPLAY WS-DETAIL-LINE-3
+           DISPLAY WS-DETAIL-LINE-4
+           DISPLAY WS-DETAIL-LINE-5
+           DISPLAY WS-DETAIL-LINE-6
+           DISPLAY SPACES
+           DISPLAY WS-SEPARATOR.
