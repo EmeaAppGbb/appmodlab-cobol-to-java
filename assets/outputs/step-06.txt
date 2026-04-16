@@ -1,0 +1,89 @@
+ÔùÅ Read pom.xml
+  Ôöö 65 lines read
+
+ÔùÅ List directory src\main\java\com\continental\insurance
+  Ôöö 4 files found
+
+ÔùÅ List directory data
+  Ôöö 3 files found
+
+ÔùÅ Read ClaimsProcessorApplication.java
+  Ôöé src\main\java\com\continental\insurance\ClaimsProcessorApplication.java
+  Ôöö 12 lines read
+
+ÔùÅ List directory src\main\java\com\continental\insurance\model
+  Ôöö 7 files found
+
+ÔùÅ List directory src\main\java\com\continental\insurance\service
+  Ôöö 5 files found
+
+ÔùÅ List directory src\main\java\com\continental\insurance\exception
+  Ôöö 5 files found
+
+ÔùÅ Search (glob)
+  Ôöé "src/main/resources/**"
+  Ôöö 1 file found
+
+ÔùÅ Read application.yml
+  Ôöé src\main\resources\application.yml
+  Ôöö 44 lines read
+
+ÔùÅ Read Claim.java
+  Ôöé src\main\java\com\continental\insurance\model\Claim.java
+  Ôöö 138 lines read
+
+ÔùÅ Read Policy.java
+  Ôöé src\main\java\com\continental\insurance\model\Policy.java
+  Ôöö 136 lines read
+
+ÔùÅ Read ClaimType.java
+  Ôöé src\main\java\com\continental\insurance\model\ClaimType.java
+  Ôöö 39 lines read
+
+ÔùÅ Read ClaimStatus.java
+  Ôöé src\main\java\com\continental\insurance\model\ClaimStatus.java
+  Ôöö 11 lines read
+
+ÔùÅ Read Payment.java
+  Ôöé src\main\java\com\continental\insurance\model\Payment.java
+  Ôöö 117 lines read
+
+ÔùÅ Read PaymentStatus.java
+  Ôöé src\main\java\com\continental\insurance\model\PaymentStatus.java
+  Ôöö 38 lines read
+
+ÔùÅ Read PlanType.java
+  Ôöé src\main\java\com\continental\insurance\model\PlanType.java
+  Ôöö 39 lines read
+
+Now let me read the service classes and data files:
+
+ÔùÅ Read ClaimsProcessingService.java
+  Ôöé src\main\java\com\continental\insurance\service\ClaimsProcessingService.java
+  Ôöö 199 lines read
+
+ÔùÅ Read AdjudicationService.java
+  Ôöé src\main\java\com\continental\insurance\service\AdjudicationService.java
+  Ôöö 237 lines read
+
+ÔùÅ Read PolicyLookupService.java
+  Ôöé src\main\java\com\continental\insurance\service\PolicyLookupService.java
+  Ôöö 59 lines read
+
+ÔùÅ Read ReportGenerationService.java
+  Ôöé src\main\java\com\continental\insurance\service\ReportGenerationService.java
+  Ôöö 158 lines read
+
+ÔùÅ Read PaymentAuthorizationService.java
+  Ôöé src\main\java\com\continental\insurance\service\PaymentAuthorizationService.
+  Ôöé java
+  Ôöö 202 lines read
+
+ÔùÅ Read policies.dat
+  Ôöé data\policies.dat
+  Ôöö 22 lines read
+
+ÔùÅ Read claims.dat
+  Ôöé data\claims.dat
+  Ôöö 20 lines read
+

@@ -2,12 +2,13 @@ package com.continental.insurance.service;
 
 import com.continental.insurance.exception.PolicyNotFoundException;
 import com.continental.insurance.model.Policy;
+import com.continental.insurance.repository.PolicyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -15,15 +16,15 @@ import java.util.Optional;
  * <p>
  * The original COBOL program performed a sequential file search through
  * data/policies.dat to locate a matching policy number. This Java version
- * replaces that with JPA-based database queries.
+ * replaces that with Spring Data JPA repository queries.
  */
 @Service
 public class PolicyLookupService {
 
     private static final Logger log = LoggerFactory.getLogger(PolicyLookupService.class);
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private PolicyRepository policyRepository;
 
     /**
      * Look up a policy by its policy number.
@@ -36,15 +37,15 @@ public class PolicyLookupService {
     public Policy lookupPolicy(String policyNumber) {
         log.debug("Looking up policy: {}", policyNumber);
 
-        Policy policy = entityManager.find(Policy.class, policyNumber);
+        Optional<Policy> policy = policyRepository.findById(policyNumber);
 
-        if (policy == null) {
+        if (!policy.isPresent()) {
             log.warn("Policy not found: {}", policyNumber);
             throw new PolicyNotFoundException(policyNumber);
         }
 
-        log.debug("Policy found: {}", policy.getPolicyNumber());
-        return policy;
+        log.debug("Policy found: {}", policy.get().getPolicyNumber());
+        return policy.get();
     }
 
     /**
@@ -54,6 +55,15 @@ public class PolicyLookupService {
      * @return an Optional containing the policy, or empty if not found
      */
     public Optional<Policy> findPolicy(String policyNumber) {
-        return Optional.ofNullable(entityManager.find(Policy.class, policyNumber));
+        return policyRepository.findById(policyNumber);
+    }
+
+    /**
+     * Get all policies.
+     *
+     * @return list of all policies
+     */
+    public List<Policy> getAllPolicies() {
+        return policyRepository.findAll();
     }
 }

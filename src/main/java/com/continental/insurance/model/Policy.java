@@ -22,7 +22,7 @@ public class Policy {
     @Column(name = "policy_number", length = 10)
     private String policyNumber;
 
-    @Column(name = "holder_name", length = 30, nullable = false)
+    @Column(name = "holder_name", length = 28, nullable = false)
     private String holderName;
 
     @Enumerated(EnumType.STRING)

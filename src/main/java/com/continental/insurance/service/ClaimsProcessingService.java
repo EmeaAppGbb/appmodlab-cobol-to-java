@@ -5,14 +5,14 @@ import com.continental.insurance.model.Claim;
 import com.continental.insurance.model.ClaimStatus;
 import com.continental.insurance.model.Payment;
 import com.continental.insurance.model.Policy;
+import com.continental.insurance.repository.ClaimRepository;
+import com.continental.insurance.repository.PaymentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +32,11 @@ public class ClaimsProcessingService {
 
     private static final Logger log = LoggerFactory.getLogger(ClaimsProcessingService.class);
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private ClaimRepository claimRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Autowired
     private PolicyLookupService policyLookupService;
@@ -93,9 +96,7 @@ public class ClaimsProcessingService {
         log.info("INITIALIZING SYSTEM...");
 
         // 1000-INITIALIZATION: read all claims from the database
-        List<Claim> claims = entityManager
-                .createQuery("SELECT c FROM Claim c", Claim.class)
-                .getResultList();
+        List<Claim> claims = claimRepository.findAll();
 
         log.info("Processing date: {}", java.time.LocalDate.now());
         log.info("Total claims to process: {}", claims.size());
@@ -166,7 +167,7 @@ public class ClaimsProcessingService {
         } catch (PolicyNotFoundException e) {
             log.warn("  POLICY NOT FOUND: {}", claim.getPolicyNumber());
             claim.setStatus(ClaimStatus.DENIED);
-            entityManager.merge(claim);
+            claimRepository.save(claim);
             return ClaimStatus.DENIED;
         }
 
@@ -180,7 +181,7 @@ public class ClaimsProcessingService {
                 // 2200-AUTHORIZE-PAYMENT
                 Payment payment = paymentAuthorizationService.authorizePayment(claim, policy);
                 if (payment.getPaymentAmount().compareTo(BigDecimal.ZERO) > 0) {
-                    entityManager.persist(payment);
+                    paymentRepository.save(payment);
                     payments.add(payment);
                     log.info("  PAYMENT AUTHORIZED: ${}", payment.getPaymentAmount());
                 }
@@ -193,7 +194,7 @@ public class ClaimsProcessingService {
                 break;
         }
 
-        entityManager.merge(claim);
+        claimRepository.save(claim);
         return result;
     }
 }
