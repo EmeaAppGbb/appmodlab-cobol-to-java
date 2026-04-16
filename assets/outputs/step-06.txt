@@ -87,3 +87,270 @@ Now let me read the service classes and data files:
   Ôöé data\claims.dat
   Ôöö 20 lines read
 
+Now I have a full picture of the codebase. Let me check the exception classes and then look for COBOL copybooks to confirm the data format:
+
+ÔùÅ Read PolicyNotFoundException.java
+  Ôöé src\main\java\com\continental\insurance\exception\PolicyNotFoundException.ja
+  Ôöé va
+  Ôöö 21 lines read
+
+ÔùÅ Read ClaimsProcessingException.java
+  Ôöé src\main\java\com\continental\insurance\exception\ClaimsProcessingException.
+  Ôöé java
+  Ôöö 24 lines read
+
+ÔùÅ Search (glob)
+  Ôöé "src/cobol/**/*.cpy"
+  Ôöö No matches found
+
+ÔùÅ Create repository, config, and controller directories (shell)
+  Ôöé New-Item -ItemType Directory -Path "C:\code\gbb\labs\appmodlab-cobol-to-ja
+  Ôöé va\src\main\java\com\continental\insurance\repository" -Force | Out-Null;
+  Ôöé New-Item -ItemType Directory -Path "C:\code\gbb\labs\appmodlab-cobol-to-ja
+  Ôöé va\src\main\java\com\continental\insurance\config" -Force | Out-Null;
+  Ôöé New-Item -ItemType Directory -Path "C:\code\gbb\labs\appmodlab-cobol-to-jaÔÇª
+  Ôöö 4 lines...
+
+Now let me create all the files. Starting with repositories, DataLoader, and controllers:
+
+ÔùÅ Create PaymentRepository.java +18
+  Ôöö src\main\java\com\continental\insurance\repository\PaymentRepository.java
+
+ÔùÅ Create ClaimRepository.java +24
+  Ôöö src\main\java\com\continental\insurance\repository\ClaimRepository.java
+
+ÔùÅ Create PolicyRepository.java +20
+  Ôöö src\main\java\com\continental\insurance\repository\PolicyRepository.java
+
+ÔùÅ Create DataLoader.java +216
+  Ôöö src\main\java\com\continental\insurance\config\DataLoader.java
+
+ÔùÅ Create ReportController.java +65
+  Ôöö src\main\java\com\continental\insurance\controller\ReportController.java
+
+ÔùÅ Create ClaimsController.java +132
+  Ôöö src\main\java\com\continental\insurance\controller\ClaimsController.java
+
+ÔùÅ Create PolicyController.java +43
+  Ôöö src\main\java\com\continental\insurance\controller\PolicyController.java
+
+Now update the `PolicyLookupService` to use the repository instead of raw `EntityManager`:
+
+ÔùÅ Edit PolicyLookupService.java +20 -10
+  Ôöö src\main\java\com\continental\insurance\service\PolicyLookupService.java
+
+Now update `ClaimsProcessingService` to use repositories instead of raw EntityManager:
+
+ÔùÅ Edit ClaimsProcessingService.java +2 -2
+  Ôöö src\main\java\com\continental\insurance\service\ClaimsProcessingService.java
+
+ÔùÅ Edit ClaimsProcessingService.java +5 -2
+  Ôöö src\main\java\com\continental\insurance\service\ClaimsProcessingService.java
+
+ÔùÅ Edit ClaimsProcessingService.java +1 -3
+  Ôöö src\main\java\com\continental\insurance\service\ClaimsProcessingService.java
+
+ÔùÅ Edit ClaimsProcessingService.java +1 -1
+  Ôöö src\main\java\com\continental\insurance\service\ClaimsProcessingService.java
+
+ÔùÅ Edit ClaimsProcessingService.java +1 -1
+  Ôöö src\main\java\com\continental\insurance\service\ClaimsProcessingService.java
+
+ÔùÅ Edit ClaimsProcessingService.java
+  Ôöö src\main\java\com\continental\insurance\service\ClaimsProcessingService.java
+
+I need to fix the last remaining `entityManager.merge(claim)` reference:
+
+ÔùÅ Read ClaimsProcessingService.java
+  Ôöé src\main\java\com\continental\insurance\service\ClaimsProcessingService.java
+  Ôöö L185:200 (16 lines read)
+
+ÔùÅ Edit ClaimsProcessingService.java +1 -1
+  Ôöö src\main\java\com\continental\insurance\service\ClaimsProcessingService.java
+
+Now let's build to verify everything compiles:
+
+ÔùÅ Maven compile to check for errors (shell)
+  Ôöé cd C:\code\gbb\labs\appmodlab-cobol-to-java; mvn compile -q 2>&1
+  Ôöö 7 lines...
+
+ÔùÅ Find Maven and Java (shell)
+  Ôöé cd C:\code\gbb\labs\appmodlab-cobol-to-java; Get-Command mvnw*, mvn*
+  Ôöé -ErrorAction SilentlyContinue; if (Test-Path "mvnw.cmd") { Write-Output
+  Ôöé "mvnw.cmd exists" } elseif (Test-Path "mvnw") { Write-Output "mvnw exists"
+  Ôöé }; $env:JAVA_HOME; $env:M2_HOME; where.exe java 2>&1; where.exe mvn 2>&1
+  Ôöö 3 lines...
+
+ÔùÅ Search for Java and Maven installations (shell)
+  Ôöé $env:PATH -split ';' | Select-String -Pattern 'java|maven|mvn'
+  Ôöé -CaseSensitive:$false; Get-ChildItem "C:\Program Files\*" -Directory |
+  Ôöé Where-Object { $_.Name -match 'java|maven|jdk' } | Select-Object
+  Ôöé -ExpandProperty FullName; Get-ChildItem "C:\tools\*" -Directory
+  Ôöé -ErrorAction SilentlyContinue | Where-Object { $_.Name -match ÔÇª
+  Ôöö 3 lines...
+
+ÔùÅ Find JDK installation (shell)
+  Ôöé Get-ChildItem "C:\Program Files\Eclipse Adoptium\*" -ErrorAction
+  Ôöé SilentlyContinue; Get-ChildItem "C:\Program Files\Java\*" -ErrorAction
+  Ôöé SilentlyContinue; Get-ChildItem "C:\Program Files\Microsoft\*" -Directory
+  Ôöé -ErrorAction SilentlyContinue | Where-Object { $_.Name -match 'jdk' }
+  Ôöö 5 lines...
+
+ÔùÅ Compile with Java 8 and Maven (shell)
+  Ôöé $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-8.0.482.8-hotspot";
+  Ôöé $env:PATH = "$env:JAVA_HOME\bin;C:\Tools\apache-maven-3.9.9\bin;$env:PATH";
+  Ôöé cd C:\code\gbb\labs\appmodlab-cobol-to-java; mvn compile -q 2>&1
+  Ôöö 1 line...
+
+Build succeeded. Now let's do a quick smoke test by running the application:
+
+ÔùÅ Run Spring Boot app to test (shell)
+  Ôöé $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-8.0.482.8-hotspot";
+  Ôöé $env:PATH = "$env:JAVA_HOME\bin;C:\Tools\apache-maven-3.9.9\bin;$env:PATH";
+  Ôöé cd C:\code\gbb\labs\appmodlab-cobol-to-java; mvn spring-boot:run -q 2>&1
+  Ôöö 1 line...
+
+ÔùÅ Read shell output Waiting up to 20 seconds for command output
+  Ôöö 8 lines...
+
+ÔùÅ Read shell output Waiting up to 15 seconds for command output
+  Ôöö 8 lines...
+
+ÔùÅ Read shell output Waiting up to 20 seconds for command output
+  Ôöö 8 lines...
+
+The output seems truncated. Let me check if the app started or if there's an error:
+
+ÔùÅ Test claims endpoint (shell)
+  Ôöé try { $r = Invoke-WebRequest -Uri "http://localhost:8080/api/claims"
+  Ôöé -UseBasicParsing -TimeoutSec 5; $r.StatusCode; $r.Content.Substring(0,
+  Ôöé [Math]::Min(500, $r.Content.Length)) } catch { $_.Exception.Message }
+  Ôöö 3 lines...
+
+The app is running and returning data. Let me test all endpoints:
+
+ÔùÅ Test all REST endpoints (shell)
+  Ôöé # Test individual claim
+  Ôöé $r = Invoke-WebRequest -Uri "http://localhost:8080/api/claims/CLM0000001"
+  Ôöé -UseBasicParsing -TimeoutSec 5; "GET /api/claims/{id}: $($r.StatusCode)"
+  Ôöé # Test policies
+  Ôöé $r = Invoke-WebRequest -Uri "http://localhost:8080/api/policies" ÔÇª
+  Ôöö 36 lines...
+
+Most endpoints work, but policies aren't loading (all claims denied due to missing policies). Let me debug:
+
+ÔùÅ Debug policy data parsing (shell)
+  Ôöé $lines = Get-Content
+  Ôöé "C:\code\gbb\labs\appmodlab-cobol-to-java\data\policies.dat"; foreach ($l
+  Ôöé in $lines) { Write-Output "Length=$($l.Length): $($l.Substring(0,
+  Ôöé [Math]::Min(20, $l.Length)))..." }; Write-Output "---"; $line = $lines[0];
+  Ôöé Write-Output "Full line 1: [$line]"; Write-Output "Substring(10,30): ÔÇª
+  Ôöö 40 lines...
+
+Lines are 72 chars, not 73! My policy offsets are wrong. The holder name is 28 chars (not 30), and max coverage is 8 chars. Let me fix:
+
+ÔùÅ Edit DataLoader.java +13 -13
+  Ôöö src\main\java\com\continental\insurance\config\DataLoader.java
+
+Also update the Javadoc to match:
+
+ÔùÅ Edit DataLoader.java +7 -7
+  Ôöö src\main\java\com\continental\insurance\config\DataLoader.java
+
+Now also need to update the Policy entity's `holderName` column length from 30 to 28:
+
+ÔùÅ Edit Policy.java +1 -1
+  Ôöö src\main\java\com\continental\insurance\model\Policy.java
+
+Now stop the old server, rebuild and retest:
+
+ÔùÅ Stop shell
+  Ôöö 1 line...
+
+ÔùÅ Rebuild after fixes (shell)
+  Ôöé $env:JAVA_HOME = "C:\Program Files\Eclipse
+  Ôöé Adoptium\jdk-8.0.482.8-hotspot"; $env:PATH =
+  Ôöé "$env:JAVA_HOME\bin;C:\Tools\apache-maven-3.9.9\bin;$env:PATH"; cd
+  Ôöé C:\code\gbb\labs\appmodlab-cobol-to-java; mvn compile -q 2>&1; if
+  Ôöé ($LASTEXITCODE -eq 0) { Write-Output "BUILD OK" } else { Write-Output ÔÇª
+  Ôöö 3 lines...
+
+ÔùÅ Start Spring Boot app (shell)
+  Ôöé $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-8.0.482.8-hotspot";
+  Ôöé $env:PATH = "$env:JAVA_HOME\bin;C:\Tools\apache-maven-3.9.9\bin;$env:PATH";
+  Ôöé cd C:\code\gbb\labs\appmodlab-cobol-to-java; mvn spring-boot:run -q 2>&1
+  Ôöö 1 line...
+
+ÔùÅ Read shell output Waiting up to 30 seconds for command output
+  Ôöö 8 lines...
+
+ÔùÅ Test with fixed policy parsing (shell)
+  Ôöé Start-Sleep -Seconds 10; try { $r = Invoke-WebRequest -Uri
+  Ôöé "http://localhost:8080/api/policies" -UseBasicParsing -TimeoutSec 5;
+  Ôöé "Policies count approx: $(($r.Content | ConvertFrom-Json).Count)" } catch
+  Ôöé { "Policies endpoint error: $($_.Exception.Message)" }; try { $r =
+  Ôöé Invoke-WebRequest -Uri "http://localhost:8080/api/policies/POL1000001" ÔÇª
+  Ôöö 10 lines...
+
+All 22 policies loaded correctly. Adjudication now works ÔÇö CLM0000001 is APPROVED with payment of $900.00. Let me run a full test of all endpoints:
+
+ÔùÅ Full endpoint validation (shell)
+  Ôöé # Process all claims
+  Ôöé $r = Invoke-WebRequest -Uri "http://localhost:8080/api/claims/process"
+  Ôöé -Method POST -UseBasicParsing -TimeoutSec 10
+  Ôöé "Process all: $($r.Content)"
+  Ôöé # Summary reportÔÇª
+  Ôöö 15 lines...
+
+All endpoints working correctly. Let me stop the server and run the Maven tests:
+
+ÔùÅ Stop shell
+  Ôöö 1 line...
+
+ÔùÅ Run Maven tests (shell)
+  Ôöé $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-8.0.482.8-hotspot";
+  Ôöé $env:PATH = "$env:JAVA_HOME\bin;C:\Tools\apache-maven-3.9.9\bin;$env:PATH";
+  Ôöé cd C:\code\gbb\labs\appmodlab-cobol-to-java; mvn test -q 2>&1
+  Ôöö 1 line...
+
+All tests pass. Let me commit the changes:
+
+ÔùÅ Stage and review changes (shell)
+  Ôöé cd C:\code\gbb\labs\appmodlab-cobol-to-java; git add -A; git --no-pager diff
+  Ôöé --cached --stat
+  Ôöö 13 lines...
+
+ÔùÅ Commit all changes (shell)
+  Ôöé cd C:\code\gbb\labs\appmodlab-cobol-to-java; git commit -m "Step 6: Add
+  Ôöé data access layer, DataLoader, and REST controllers
+  Ôöé
+  Ôöé - Create Spring Data JPA repositories (ClaimRepository, PolicyRepository,
+  Ôöé PaymentRepository) with custom query methodsÔÇª
+  Ôöö 26 lines...
+
+ÔùÅ Memory stored data file formats
+  Ôöö claims.dat: 53-char fixed-width (clm#10, pol#10, date8, type2, amt8(/100),
+    diag5ÔÇª
+
+Step 6 is complete. Here's what was implemented:
+
+**Repositories** (3 interfaces):
+- `ClaimRepository` ÔÇö `findByPolicyNumber`, `findByStatus`, `findByClaimType`
+- `PolicyRepository` ÔÇö `findByPolicyNumber`, `findByPolicyStatus`
+- `PaymentRepository` ÔÇö `findByClaimNumber`
+
+**DataLoader** ÔÇö Parses COBOL fixed-width files (`claims.dat` at 53 chars/line, `policies.dat` at 72 chars/line) into H2 on startup. Fixed the policy holder name field (28 chars, not 30).
+
+**REST Controllers**:
+- `ClaimsController` ÔÇö `GET /api/claims`, `GET /api/claims/{id}`, `POST /api/claims/process`, `POST /api/claims/{id}/adjudicate`
+- `PolicyController` ÔÇö `GET /api/policies`, `GET /api/policies/{id}`
+- `ReportController` ÔÇö `GET /api/reports/summary`
+
+**Service updates** ÔÇö `PolicyLookupService` and `ClaimsProcessingService` now use Spring Data repositories instead of raw `EntityManager`.
+
+**Verified**: 22 policies and 20 claims loaded; batch processing approved 16 claims, denied 4, with $17,229.50 in payments. All Maven tests pass.
+
+
+Changes   +570 -41
+Requests  3 Premium (12m 55s)
+Tokens    Ôåæ 2.6m ÔÇó Ôåô 36.0k ÔÇó 2.5m (cached)
