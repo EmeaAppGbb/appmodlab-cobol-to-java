@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: claims-processor
+
+  datasource:
+    url: jdbc:h2:mem:claimsdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# Business rule constants — externalized from COBOL hardcoded values
+claims:
+  adjudication:
+    min-claim-amount: 50.00
+    max-auto-approve: 5000.00
+    manual-review-limit: 25000.00
+    dental-max: 2500.00
+    vision-max: 500.00
+
+  coinsurance:
+    basic: 80
+    silver: 70
+    premium: 90
+    bronze: 60
+    default-rate: 80
+
+  copay:
+    medical: 25.00
+    dental: 15.00
+    vision: 10.00
+    pharmacy: 10.00
